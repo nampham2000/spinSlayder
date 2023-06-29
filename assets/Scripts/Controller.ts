@@ -37,7 +37,7 @@ export class Controller extends Component {
     private previousLevel:number;
     private levelup1:boolean=false
     private charLevel:number=0;
-    private monsterPrefabsCount:number=0;
+    private monsterPrefabsCount:number=1;
     start() {
       this.charLevel=this.GameModel.Weapon.characterLevel;
       this.previousLevel = this.charLevel;
@@ -50,7 +50,7 @@ export class Controller extends Component {
     }
     
     update(deltaTime: number) {
-
+      console.log(this.GameModel.Frogie.getComponent(FrogieController).life);
       this.delta=deltaTime;
       this.getMonster();
       this.getAllMonstersFromNode();
@@ -66,6 +66,12 @@ export class Controller extends Component {
         this.previousLevel = this.charLevel;
       }
       this.levelup()
+      this.MonstersSpawn();
+      this.CheckHeartLife();
+      if(this.GameView.LevelText.string)
+      {
+        this.GameView.LevelText.string = 'Level:' + this.charLevel;
+      }
     }
   
   private getMonster(): BaseEnemy | BatGhostMove {
@@ -75,8 +81,9 @@ export class Controller extends Component {
         return this.monsters[i];
       }
     }
-    if (this.monsterCount < this.maxMonsters*this.charLevel) {
-      const monsterPrefab = this.enemyTypes[this.monsterPrefabsCount].prefab;
+    
+    if (this.monsterCount < this.maxMonsters*this.monsterPrefabsCount) {
+      const monsterPrefab = this.enemyTypes[this.monsterPrefabsCount-1].prefab;
       const monsterNode = instantiate(monsterPrefab);
       monsterNode.setPosition(this.getRandomPositionOutsideScreen());
       monsterNode.parent = this.MonstersNode;
@@ -84,7 +91,7 @@ export class Controller extends Component {
       if (this.charLevel === 1 ) {
         monster = monsterNode.addComponent(BaseEnemy);
       } 
-      else if (this.charLevel === 2 ) 
+      else if (this.charLevel >= 2 ) 
       {
         this.monsterPrefabsCount=1
         monster = monsterNode.addComponent(BatGhostMove);
@@ -103,6 +110,14 @@ export class Controller extends Component {
     });
   }
 
+  private MonstersSpawn()
+  {
+    if(this.charLevel===3)
+    {
+      this.monsterPrefabsCount=2;
+    }
+    
+  }
   private getRandomPositionOutsideScreen() {
     const screenSize = view.getVisibleSize(); 
     const screenWidth = screenSize.width;
@@ -124,6 +139,13 @@ export class Controller extends Component {
     return new Vec3(randomX, randomY, 0);
   }
 
+  private CheckHeartLife():void
+  {
+    if(this.GameModel.Frogie.getComponent(FrogieController).life===0)
+    {
+      this.GameOver();
+    }
+  }
   private levelBar():void
   {
     if(this.BarPoint<1)
@@ -156,7 +178,7 @@ export class Controller extends Component {
 
   private ShowAttribute():void
   {
-    this.nodesPos=[new Vec3(-259,-27), new Vec3(20.378,-27),  new Vec3(300.247,-27)];
+    this.nodesPos=[new Vec3(-259,0), new Vec3(20.378,0),  new Vec3(300.247,0)];
     this.shuffleArray(this.nodes);
     const selectedNodes = this.nodes.slice(0, 3);
     selectedNodes.forEach(node => node.active = true);    
@@ -198,6 +220,11 @@ export class Controller extends Component {
     const selectedNodes = this.nodes;
     selectedNodes.forEach(node => node.active = false);  
     director.resume()
+  }
+
+  private GameOver():void
+  {
+    this.GameView.Gameover.active=true;
   }
 }
 

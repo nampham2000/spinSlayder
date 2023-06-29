@@ -1,4 +1,4 @@
-import { _decorator, Button, Component, Node, ProgressBar } from 'cc';
+import { _decorator, Button, Component, Label, Node, ProgressBar } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameView')
@@ -37,5 +37,24 @@ export class GameView extends Component {
     public get ChooseSpeedChar() : Button {
         return this.chooseSpeedChar;
     }
+
+    @property(Node)
+    private gameOver: Node ;
+
+    public get Gameover() : Node {
+        return this.gameOver;
+    }
+
+    @property(Label)
+    private levelText: Label
+    
+    public get LevelText() : Label {
+        return this.levelText;
+    }
+    public set LevelText(value: Label){
+        value= this.levelText;
+    }
+
+
 }
 

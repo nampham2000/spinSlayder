@@ -71,8 +71,16 @@ export class Bullet extends Component {
     if(otherCollider.tag===5)
     {
       this.kill=this.kill+1
-      otherCollider.node.active=false;
-      otherCollider.node.position=this.getRandomPositionOutsideScreen();
+      console.log(this.kill);
+      otherCollider.node.getComponent(Animation).play('Die');
+      otherCollider.node.getComponent(Collider2D).enabled=false;
+      setTimeout(() => {
+        otherCollider.node.active=false;
+        otherCollider.node.position=this.getRandomPositionOutsideScreen();
+        otherCollider.node.getComponent(Animation).play('GhostMove');
+        otherCollider.node.getComponent(Collider2D).enabled=true;
+
+      }, 0.46*1000);
     }
   }
 
